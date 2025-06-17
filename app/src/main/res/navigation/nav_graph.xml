@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/expenseListFragment">
+
+    <fragment
+        android:id="@+id/expenseListFragment"
+        android:name="com.example.appfinanceiro.ui.expense.ExpenseListFragment"
+        android:label="@string/expenses">
+        <action
+            android:id="@+id/action_expenseListFragment_to_expenseFormFragment"
+            app:destination="@id/expenseFormFragment" />
+        <action
+            android:id="@+id/action_expenseListFragment_to_expenseDetailFragment"
+            app:destination="@id/expenseDetailFragment" />
+        <action
+            android:id="@+id/action_expenseListFragment_to_expenseReportFragment"
+            app:destination="@id/expenseReportFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/expenseFormFragment"
+        android:name="com.example.appfinanceiro.ui.expense.ExpenseFormFragment"
+        android:label="@string/add_expense">
+        <argument
+            android:name="expenseId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/expenseDetailFragment"
+        android:name="com.example.appfinanceiro.ui.expense.ExpenseDetailFragment"
+        android:label="@string/expense_detail">
+        <argument
+            android:name="expenseId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_expenseDetailFragment_to_expenseFormFragment"
+            app:destination="@id/expenseFormFragment" />
+        <action
+            android:id="@+id/action_expenseDetailFragment_to_receiptListFragment"
+            app:destination="@id/receiptListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/receiptListFragment"
+        android:name="com.example.appfinanceiro.ui.receipt.ReceiptListFragment"
+        android:label="@string/receipts">
+        <argument
+            android:name="expenseId"
+            app:argType="long" />
+        <action
+            android:id="@+id/action_receiptListFragment_to_receiptFormFragment"
+            app:destination="@id/receiptFormFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/receiptFormFragment"
+        android:name="com.example.appfinanceiro.ui.receipt.ReceiptFormFragment"
+        android:label="@string/add_receipt">
+        <argument
+            android:name="expenseId"
+            app:argType="long" />
+        <argument
+            android:name="receiptId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/expenseReportFragment"
+        android:name="com.example.appfinanceiro.ui.report.ExpenseReportFragment"
+        android:label="@string/expense_report">
+        <action
+            android:id="@+id/action_expenseReportFragment_to_expenseDetailFragment"
+            app:destination="@id/expenseDetailFragment" />
+    </fragment>
+
+</navigation> 
