@@ -1,6 +1,7 @@
 package com.example.appfinanceiro
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -23,6 +24,12 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         setupActionBarWithNavController(navController)
+
+        // FAB só visível na tela de lista de despesas
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.fabAddExpense.visibility =
+                if (destination.id == R.id.expenseListFragment) View.VISIBLE else View.GONE
+        }
 
         binding.fabAddExpense.setOnClickListener {
             val action = ExpenseListFragmentDirections

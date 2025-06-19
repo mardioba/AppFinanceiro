@@ -1,5 +1,7 @@
 package com.example.appfinanceiro.ui.expense
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -7,6 +9,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -28,7 +31,9 @@ class ExpenseDetailFragment : Fragment() {
 
     private val viewModel: FinanceViewModel by viewModels()
     private val args: ExpenseDetailFragmentArgs by navArgs()
-    private val receiptAdapter = ReceiptAdapter()
+    private val receiptAdapter = ReceiptAdapter { receipt ->
+        openReceiptFile(receipt.filePath)
+    }
 
     private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
     private val currencyFormat = NumberFormat.getCurrencyInstance(Locale("pt", "BR"))
@@ -117,6 +122,27 @@ class ExpenseDetailFragment : Fragment() {
         binding.tvRecurringStatus.text = getString(
             if (expense.isRecurring) R.string.expense_recurring else R.string.expense_one_time
         )
+    }
+
+    private fun openReceiptFile(filePath: String) {
+        try {
+            val uri = Uri.parse(filePath)
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setDataAndType(uri, getMimeType(uri))
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Não foi possível abrir o comprovante.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun getMimeType(uri: Uri): String? {
+        val contentResolver = requireContext().contentResolver
+        return contentResolver.getType(uri) ?: when {
+            uri.toString().endsWith(".pdf") -> "application/pdf"
+            uri.toString().matches(Regex(".*\\.(jpg|jpeg|png|gif)$", RegexOption.IGNORE_CASE)) -> "image/*"
+            else -> "*/*"
+        }
     }
 
     override fun onDestroyView() {

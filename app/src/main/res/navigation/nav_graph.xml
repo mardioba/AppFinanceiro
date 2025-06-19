@@ -17,6 +17,9 @@
         <action
             android:id="@+id/action_expenseListFragment_to_expenseReportFragment"
             app:destination="@id/expenseReportFragment" />
+        <action
+            android:id="@+id/action_expenseListFragment_to_receiptFormFragment"
+            app:destination="@id/receiptFormFragment" />
     </fragment>
 
     <fragment

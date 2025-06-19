@@ -10,7 +10,9 @@ import com.example.appfinanceiro.databinding.ItemReceiptBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class ReceiptAdapter : ListAdapter<Receipt, ReceiptAdapter.ReceiptViewHolder>(ReceiptDiffCallback()) {
+class ReceiptAdapter(
+    private val onItemClick: (Receipt) -> Unit
+) : ListAdapter<Receipt, ReceiptAdapter.ReceiptViewHolder>(ReceiptDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReceiptViewHolder {
         val binding = ItemReceiptBinding.inflate(
@@ -18,7 +20,7 @@ class ReceiptAdapter : ListAdapter<Receipt, ReceiptAdapter.ReceiptViewHolder>(Re
             parent,
             false
         )
-        return ReceiptViewHolder(binding)
+        return ReceiptViewHolder(binding, onItemClick)
     }
 
     override fun onBindViewHolder(holder: ReceiptViewHolder, position: Int) {
@@ -26,7 +28,8 @@ class ReceiptAdapter : ListAdapter<Receipt, ReceiptAdapter.ReceiptViewHolder>(Re
     }
 
     class ReceiptViewHolder(
-        private val binding: ItemReceiptBinding
+        private val binding: ItemReceiptBinding,
+        private val onItemClick: (Receipt) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         private val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale("pt", "BR"))
 
@@ -34,6 +37,7 @@ class ReceiptAdapter : ListAdapter<Receipt, ReceiptAdapter.ReceiptViewHolder>(Re
             binding.apply {
                 tvReceiptDate.text = dateFormat.format(receipt.date)
                 tvReceiptPath.text = receipt.filePath
+                root.setOnClickListener { onItemClick(receipt) }
             }
         }
     }

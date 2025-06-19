@@ -25,16 +25,20 @@ class ExpenseReportFragment : Fragment() {
 
     private val viewModel: FinanceViewModel by viewModels()
     private val categoryAdapter = CategoryReportAdapter()
-    private val expenseAdapter = ExpenseAdapter(
-        onItemClick = { expense ->
-            val action = ExpenseReportFragmentDirections
-                .actionExpenseReportFragmentToExpenseDetailFragment(expense.id)
-            findNavController().navigate(action)
-        },
-        onPaidChanged = { expense, isPaid ->
-            viewModel.updateExpense(expense.copy(isPaid = isPaid))
-        }
-    )
+    private val expenseAdapter by lazy {
+        val navController = findNavController()
+        ExpenseAdapter(
+            onItemClick = { expense ->
+                val action = ExpenseReportFragmentDirections
+                    .actionExpenseReportFragmentToExpenseDetailFragment(expense.id)
+                navController.navigate(action)
+            },
+            onPaidChanged = { expense, isPaid ->
+                viewModel.updateExpense(expense.copy(isPaid = isPaid))
+            },
+            navController = navController
+        )
+    }
 
     private var currentMonth: Calendar = Calendar.getInstance()
 

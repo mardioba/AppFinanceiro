@@ -48,15 +48,17 @@ class ExpenseListFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
+        val navController = findNavController()
         expenseAdapter = ExpenseAdapter(
             onItemClick = { expense ->
                 val action = ExpenseListFragmentDirections
                     .actionExpenseListFragmentToExpenseDetailFragment(expense.id)
-                findNavController().navigate(action)
+                navController.navigate(action)
             },
             onPaidChanged = { expense, isPaid ->
                 viewModel.updateExpense(expense.copy(isPaid = isPaid))
-            }
+            },
+            navController = navController
         )
 
         binding.recyclerExpenses.apply {
