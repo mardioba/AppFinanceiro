@@ -58,6 +58,9 @@ class ExpenseFormFragment : Fragment() {
         setupDatePicker()
         setupClickListeners()
         loadExpenseIfEditing()
+        binding.switchExpenseRecurring.setOnCheckedChangeListener { _, isChecked ->
+            binding.layoutRecurringMonths.visibility = if (isChecked) View.VISIBLE else View.GONE
+        }
     }
 
     private fun setupCategoryDropdown() {
@@ -126,6 +129,8 @@ class ExpenseFormFragment : Fragment() {
         val notes = binding.editExpenseNotes.text.toString()
         val isPaid = binding.switchExpensePaid.isChecked
         val isRecurring = binding.switchExpenseRecurring.isChecked
+        val recurringMonthsStr = binding.editRecurringMonths.text.toString()
+        val recurringMonths = recurringMonthsStr.toIntOrNull() ?: 1
 
         if (name.isBlank() || valueStr.isBlank() || category.isBlank()) {
             // TODO: Mostrar mensagem de erro
@@ -134,21 +139,38 @@ class ExpenseFormFragment : Fragment() {
 
         val value = valueStr.replace(",", ".").toDoubleOrNull() ?: 0.0
 
-        val expense = Expense(
-            id = if (args.expenseId == -1L) 0 else args.expenseId,
-            name = name,
-            value = value,
-            date = selectedDate,
-            category = category,
-            notes = notes.takeIf { it.isNotBlank() },
-            isPaid = isPaid,
-            isRecurring = isRecurring
-        )
-
-        if (args.expenseId == -1L) {
-            viewModel.insertExpense(expense)
+        if (isRecurring && recurringMonths > 1 && args.expenseId == -1L) {
+            val calendar = Calendar.getInstance().apply { time = selectedDate }
+            for (i in 0 until recurringMonths) {
+                val expense = Expense(
+                    id = 0,
+                    name = name,
+                    value = value,
+                    date = calendar.time,
+                    category = category,
+                    notes = notes.takeIf { it.isNotBlank() },
+                    isPaid = isPaid,
+                    isRecurring = true
+                )
+                viewModel.insertExpense(expense)
+                calendar.add(Calendar.MONTH, 1)
+            }
         } else {
-            viewModel.updateExpense(expense)
+            val expense = Expense(
+                id = if (args.expenseId == -1L) 0 else args.expenseId,
+                name = name,
+                value = value,
+                date = selectedDate,
+                category = category,
+                notes = notes.takeIf { it.isNotBlank() },
+                isPaid = isPaid,
+                isRecurring = isRecurring
+            )
+            if (args.expenseId == -1L) {
+                viewModel.insertExpense(expense)
+            } else {
+                viewModel.updateExpense(expense)
+            }
         }
 
         findNavController().navigateUp()

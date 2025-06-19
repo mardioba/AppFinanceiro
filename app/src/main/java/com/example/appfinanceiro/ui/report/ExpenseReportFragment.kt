@@ -35,6 +35,9 @@ class ExpenseReportFragment : Fragment() {
             },
             onPaidChanged = { expense, isPaid ->
                 viewModel.updateExpense(expense.copy(isPaid = isPaid))
+                if (isPaid && expense.isRecurring) {
+                    createNextRecurringExpense(expense)
+                }
             },
             navController = navController
         )
@@ -125,6 +128,30 @@ class ExpenseReportFragment : Fragment() {
         newCalendar.set(Calendar.SECOND, 59)
         newCalendar.set(Calendar.MILLISECOND, 999)
         return newCalendar.time
+    }
+
+    private fun createNextRecurringExpense(expense: com.example.appfinanceiro.data.model.Expense) {
+        val calendar = Calendar.getInstance().apply { time = expense.date }
+        calendar.add(Calendar.MONTH, 1)
+        val nextMonthDate = calendar.time
+        viewModel.getExpensesByDateRange(nextMonthDate, nextMonthDate).observe(viewLifecycleOwner) { expenses ->
+            val exists = expenses.any {
+                it.isRecurring &&
+                it.name == expense.name &&
+                it.category == expense.category &&
+                it.value == expense.value &&
+                it.date.month == nextMonthDate.month &&
+                it.date.year == nextMonthDate.year
+            }
+            if (!exists) {
+                val newExpense = expense.copy(
+                    id = 0,
+                    date = nextMonthDate,
+                    isPaid = false
+                )
+                viewModel.insertExpense(newExpense)
+            }
+        }
     }
 
     override fun onDestroyView() {
